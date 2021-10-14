@@ -90,6 +90,11 @@ function update() {
 		color("green");
 		rect(g.pos.x, g.pos.y, g.width, 26).isColliding.char.a;
 	});
+	if (input.isPressed) {
+				
+	}else{
+		player.pos.x -= scr;
+	}
 
 	// Ground checking Conditions
 	remove(Ground, (g) => {
@@ -100,11 +105,6 @@ function update() {
 		console.log(isColliding);
 		if (!isColliding) {
 			player.pos.y += GAME.GRAVITY;
-			if (input.isPressed) {
-				
-			}else{
-				player.pos.x -= scr;
-			}
 			
 			// char(addWithCharCode("a", floor(ticks / 20) % 2), player.pos);
 			

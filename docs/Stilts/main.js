@@ -104,16 +104,19 @@ function update() {
 		// Remove the Ground when it is out of the screen
 		return g.pos.x + g.width  < 0
 	});
-	console.log(isColliding);
-	if (!isColliding) {
-		player.pos.y += GAME.GRAVITY;
-		if (!input.isPressed || player.pos.y > GAME.HEIGHT - 16 ) {
+	if(input.isPressed){
+		if(player.pos.y <= GAME.HEIGHT - 10){
+			player.pos.x += GAME.PLAYERSPEED;
+		}else{
 			player.pos.x -= scr;
+			player.pos.y += GAME.GRAVITY;
 		}
-	} else {
-		//player.pos.x -= GAME.PLAYERSPEED;
-		//player.pos.y = g.pos.y - 3;
-	}
+		}else{
+			player.pos.x -= scr;
+			if (!isColliding || player.pos.y >= GAME.HEIGHT - 10) {
+				player.pos.y += GAME.GRAVITY;
+			}
+		}
 	isColliding = false;
 
 }

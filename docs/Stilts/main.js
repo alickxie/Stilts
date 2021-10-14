@@ -58,10 +58,11 @@ function update() {
 		isColliding = false;
 		Ground = [];
 		player = { pos: vec(GAME.WIDTH, 0), angle: -PI / 2 };
-		// Ground.push({
-		// 	pos: vec(GAME.WIDTH / 5, GAME.HEIGHT - 10),
-		// 	width: rnd(40, 80)
-		// });
+		Ground.push({
+			pos: vec(0, GAME.HEIGHT - 10),
+			width: GAME.WIDTH
+		});
+		nextGroundDist = 0;
 	}
 
 	// The Difficulty of the game.
@@ -92,6 +93,7 @@ function update() {
 		rect(g.pos.x, g.pos.y, g.width, 26).isColliding.char.a;
 	});
 
+
 	// Ground checking Conditions
 	remove(Ground, (g) => {
 		//CAUTION: it will execute many times after one tick causing the speed inconsistency
@@ -99,16 +101,13 @@ function update() {
 		// Add gravity to the player when collide with ground
 		color("black");
 		isColliding = isColliding || char("a", player.pos).isColliding.rect.green;
-		console.log(isColliding);
-
-		
-		
 		// Remove the Ground when it is out of the screen
-		return g.pos.x < -GAME.WIDTH / 2
+		return g.pos.x + g.width  < 0
 	});
+	console.log(isColliding);
 	if (!isColliding) {
 		player.pos.y += GAME.GRAVITY;
-		if (!input.isPressed) {
+		if (!input.isPressed || player.pos.y > GAME.HEIGHT - 16 ) {
 			player.pos.x -= scr;
 		}
 	} else {

@@ -49,12 +49,13 @@ let player;
 /** @type {{pos: Vector, width: number}[]} */
 let Ground;
 let nextGroundDist;
-
+let isColliding;
 
 // Where game update
 function update() {
 	// Initialize varaibles
 	if (!ticks) {
+		isColliding = false;
 		Ground = [];
 		player = { pos: vec(GAME.WIDTH, 0), angle: -PI / 2 };
 		// Ground.push({
@@ -90,34 +91,30 @@ function update() {
 		color("green");
 		rect(g.pos.x, g.pos.y, g.width, 26).isColliding.char.a;
 	});
-	if (input.isPressed) {
-				
-	}else{
-		player.pos.x -= scr;
-	}
 
 	// Ground checking Conditions
 	remove(Ground, (g) => {
+		//CAUTION: it will execute many times after one tick causing the speed inconsistency
 		// Checks collision with ground and moves player down if not colliding
 		// Add gravity to the player when collide with ground
 		color("black");
-		const isColliding = char("a", player.pos).isColliding.rect.green;
+		isColliding = isColliding || char("a", player.pos).isColliding.rect.green;
 		console.log(isColliding);
-		if (!isColliding) {
-			player.pos.y += GAME.GRAVITY;
-			
-			// char(addWithCharCode("a", floor(ticks / 20) % 2), player.pos);
-			
-			//if (player.pos.y != g.pos.y - 3){
-				
-			//}
-		} else {
-			//player.pos.x -= GAME.PLAYERSPEED;
-			//player.pos.y = g.pos.y - 3;
-		}
+
 		
 		
 		// Remove the Ground when it is out of the screen
 		return g.pos.x < -GAME.WIDTH / 2
 	});
+	if (!isColliding) {
+		player.pos.y += GAME.GRAVITY;
+		if (!input.isPressed) {
+			player.pos.x -= scr;
+		}
+	} else {
+		//player.pos.x -= GAME.PLAYERSPEED;
+		//player.pos.y = g.pos.y - 3;
+	}
+	isColliding = false;
+
 }

@@ -56,20 +56,21 @@ function update() {
 	// Initialize varaibles
 	if (!ticks) {
 		Ground = [];
-		player = { pos: vec(GAME.WIDTH / 5, 0), angle: -PI / 2 };
+		player = { pos: vec(GAME.WIDTH, 0), angle: -PI / 2 };
+		// Ground.push({
+		// 	pos: vec(GAME.WIDTH / 5, GAME.HEIGHT - 10),
+		// 	width: rnd(40, 80)
+		// });
 	}
 
 	// The Difficulty of the game.
 	const scr = sqrt(difficulty);
 
 	// Draw character
-	color("black");
+	//color("black");
 	// char(addWithCharCode("a", floor(ticks / 20) % 2), player.pos);
-	char("a", player.pos);
+	//char("a", player.pos);
 	//player movement (without stilts)
-	if (input.isPressed) {
-		player.pos.x += GAME.PLAYERSPEED;
-	}
 
 	// Push ground pos and width into the Ground Array
 	if (Ground.length === 0) {
@@ -84,25 +85,38 @@ function update() {
 		});
 		nextGroundDist += width + rnd(10, 20);
 	}
+	Ground.forEach((g) => {
+		g.pos.x -= scr;
+		color("green");
+		rect(g.pos.x, g.pos.y, g.width, 26).isColliding.char.a;
+	});
 
 	// Ground checking Conditions
 	remove(Ground, (g) => {
-		g.pos.x -= scr;
-		color("green");
 		// Checks collision with ground and moves player down if not colliding
-		const isColliding = rect(g.pos.x, g.pos.y, g.width, 26).isColliding.char.a;
-
 		// Add gravity to the player when collide with ground
+		color("black");
+		const isColliding = char("a", player.pos).isColliding.rect.green;
+		console.log(isColliding);
 		if (!isColliding) {
-			console.log(isColliding);
-			if (player.pos.y != g.pos.y - 3){
-				player.pos.y += GAME.GRAVITY;
+			player.pos.y += GAME.GRAVITY;
+			if (input.isPressed) {
+				
+			}else{
+				player.pos.x -= scr;
 			}
+			
+			// char(addWithCharCode("a", floor(ticks / 20) % 2), player.pos);
+			
+			//if (player.pos.y != g.pos.y - 3){
+				
+			//}
 		} else {
-			player.pos.x -= GAME.PLAYERSPEED;
-			player.pos.y = g.pos.y - 3;
+			//player.pos.x -= GAME.PLAYERSPEED;
+			//player.pos.y = g.pos.y - 3;
 		}
-
+		
+		
 		// Remove the Ground when it is out of the screen
 		return g.pos.x < -GAME.WIDTH / 2
 	});

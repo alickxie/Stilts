@@ -29,6 +29,14 @@ ll  ll
 yyyyyy
 yyyyyy
 `,
+`
+  yy
+ yy
+llllll
+llllll
+ yy
+  yy
+`
 ];
 
 // The Variable for setting up the game
@@ -65,13 +73,15 @@ let Ground;
 let nextGroundDist;
 let isColliding;
 let isup;
+let missiles;
+let endticks;
 // Where game update
 function update() {
 	// Initialize varaibles
 	if (!ticks) {
 		isColliding = false;
 		Ground = [];
-		player = { pos: vec(GAME.WIDTH / 2, GAME.HEIGHT - 20), angle: -PI / 2 };
+		player = { pos: vec(GAME.WIDTH / 2, GAME.HEIGHT - 11), angle: -PI / 2 };
 		stiltsLeftAngle = PI / 2;
 		stiltsRightAngle = PI / 2;
 		isup = true;
@@ -83,8 +93,10 @@ function update() {
 			width: GAME.WIDTH
 		});
 		nextGroundDist = 0;
+		missiles = [];
+		endticks = -1;
 	}
-
+	addScore(1);
 	// The Difficulty of the game.
 	const scr = sqrt(difficulty);
 
@@ -106,6 +118,13 @@ function update() {
 		color("green");
 		rect(g.pos.x, g.pos.y, g.width, 26);
 	});
+	while (missiles.length < 1) {
+		let posX = rnd(GAME.WIDTH, 3 * GAME.WIDTH);
+		let posY = rndi(0, 2) ? (player.pos.y - 16): (player.pos.y - 6);
+		missiles.push({
+			pos: vec(posX, posY),
+		});}
+	
 	if(input.isJustPressed){
 		isup = isup ? false : true;
 	}
@@ -124,6 +143,8 @@ function update() {
 		color("black");
 		char("a", vec(player.pos.x, player.pos.y - 10));
 	}
+	
+
 	color("green");
 	// Ground checking Conditions
 	remove(Ground, (g) => {
@@ -134,6 +155,19 @@ function update() {
 		isColliding = isColliding || char("b", player.pos).isColliding.rect.green;
 		// Remove the Ground when it is out of the screen
 		return g.pos.x + g.width < 0;
+	});
+	remove(missiles, (m) => {
+		m.pos.x -= scr * 1.5;
+		color("black");
+		let col = false;
+		if(char("d", m.pos).isColliding.char.c){
+			play("explosion");
+			col = true;
+			color("red");
+			particle(m.pos, 9);
+			endticks = 10;
+		}
+		return m.pos.x < 0 || col;
 	});
 
 	color("yellow");
@@ -153,8 +187,8 @@ function update() {
 		} 
 	} else {
 		GAME.PLAYERSPEED = 2;
+		player.pos.x -= scr / 2;
 		if (!isColliding || player.pos.y >= GAME.HEIGHT - 10) {
-			player.pos.x -= scr;
 			player.pos.y += GAME.GRAVITY;
 		}
 	}
@@ -184,6 +218,12 @@ function update() {
 	// or move too slow (Touch the left bound of the screen).
 	if (player.pos.y > 110 || player.pos.x < -5) {
 		play("laser");
+		end();
+	}
+	if(endticks > 0){
+		endticks--;
+	}
+	if(endticks == 0){
 		end();
 	}
 

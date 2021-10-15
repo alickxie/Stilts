@@ -3,7 +3,7 @@ title = "Stilts";
 
 // Instruction to play the game
 description = `
-[Tap] Climb up/down
+[Tap] Climb up/down\n
 [Hold] Accelerate
        across gaps
 `;
@@ -52,11 +52,12 @@ const GAME = {
 options = {
 	isPlayingBgm: true,
 	isReplayEnabled: true,
-	seed: 6,
+	seed: 11,
 	viewSize: { x: GAME.WIDTH, y: GAME.HEIGHT },
 	isCapturing: true,
     isCapturingGameCanvasOnly: true,
-    captureCanvasScale: 5
+    captureCanvasScale: 5,
+	theme:"dark"
 };
 
 // Create different Jsdoc for different elements in the game
@@ -75,6 +76,10 @@ let isColliding;
 let isup;
 let missiles;
 let endticks;
+// Create different Jsdoc for different elements in the game
+/** @type {{pos: Vector, speed: number}[]} */
+let strips;
+
 // Where game update
 function update() {
 	// Initialize varaibles
@@ -95,10 +100,44 @@ function update() {
 		nextGroundDist = 0;
 		missiles = [];
 		endticks = -1;
+
+		// Special Effect when accelerate
+		strips = times(20, () => {
+            // Random number generator function
+            // rnd( min, max )
+            const posX = rnd(0, GAME.WIDTH);
+            const posY = rnd(0, GAME.HEIGHT);
+            // An object of type Star with appropriate properties
+            return {
+	            // Creates a Vector
+                pos: vec(posX, posY),
+                // More RNG
+                speed: rnd(0.5, 1.0)
+            };
+        });
+
 	}
 	addScore(1);
+
 	// The Difficulty of the game.
 	const scr = sqrt(difficulty);
+
+	 // Update for Star
+	 strips.forEach((s) => {
+        // Move the star downwards
+        s.pos.x -= (s.speed*2);
+        // Bring the star back to top once it's past the bottom of the screen
+        s.pos.wrap(0, GAME.WIDTH, 0, GAME.HEIGHT);
+
+        // Choose a color to draw
+		if (input.isPressed){
+			color("black");
+		} else{
+			color("transparent");
+		}
+        // Draw the star as a square of size 1
+        bar(s.pos.x, s.pos.y, 10, 1, 0, 0);
+    });
 
 	// Push ground pos and width into the Ground Array
 	if (Ground.length === 0) {
@@ -128,6 +167,7 @@ function update() {
 	if(input.isJustPressed){
 		isup = isup ? false : true;
 	}
+
 	// Add Stilts Steps for the player
 	color("yellow");
 	bar(player.pos.x - 5, player.pos.y - 9, 20, 3, stiltsLeftAngle, 0.5).isColliding;
@@ -144,7 +184,6 @@ function update() {
 		char("a", vec(player.pos.x, player.pos.y - 10));
 	}
 	
-
 	color("green");
 	// Ground checking Conditions
 	remove(Ground, (g) => {
@@ -179,8 +218,6 @@ function update() {
 			if (player.pos.x < GAME.WIDTH){ // Don't allow the player to move out from the right bound
 				player.pos.x += GAME.PLAYERSPEED * 0.1;
 			}
-
-
 		}else{
 			player.pos.x -= scr;
 			player.pos.y += GAME.GRAVITY;
@@ -192,7 +229,7 @@ function update() {
 			player.pos.y += GAME.GRAVITY;
 		}
 	}
-				// The Stilts Animation when player is moving
+			// The Stilts Animation when player is moving
 			// It rotate left and right stilt interchange which looks like moving
 			if (!flip) {
 				stiltsRightAngle += -GAME.PLAYERSPEED/200 * PI;

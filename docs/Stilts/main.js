@@ -24,8 +24,8 @@ llllll
 ll  ll
 `,
 	`
-yyy
-yyy
+yyyyyy
+yyyyyy
 `,
 ];
 
@@ -69,7 +69,7 @@ function update() {
 	if (!ticks) {
 		isColliding = false;
 		Ground = [];
-		player = { pos: vec(GAME.WIDTH, 0), angle: -PI / 2 };
+		player = { pos: vec(GAME.WIDTH / 2, GAME.HEIGHT - 20), angle: -PI / 2 };
 		stiltsLeftAngle = PI / 2;
 		stiltsRightAngle = PI / 2;
 		flip = false;
@@ -99,82 +99,75 @@ function update() {
 		nextGroundDist += width + rnd(10, 20);
 	}
 	Ground.forEach((g) => {
-		g.pos.x -= 1, 0 * (scr);
+		g.pos.x -= scr;
 		color("green");
-		rect(g.pos.x, g.pos.y, g.width, 26).isColliding.char.a;
+		rect(g.pos.x, g.pos.y, g.width, 26);
 	});
 
 
 	// Add Stilts Steps for the player
 	color("yellow");
-	char("c", vec(player.pos.x - 3, player.pos.y + 4));
-	char("c", vec(player.pos.x + 3, player.pos.y + 4));
-	const leftStilt = bar(player.pos.x - 5, player.pos.y + 4, 20, 3, stiltsLeftAngle, 0.5).isColliding;
-	const rightStilt = bar(player.pos.x + 5, player.pos.y + 4, 20, 3, stiltsRightAngle, 0.5).isColliding;
-	if (leftStilt.rect.green || rightStilt.rect.green) {
-		onGround = true;
-	} else {
-		onGround = false;
-	}
-
+	char("c", vec(player.pos.x - 5, player.pos.y - 15));
+	char("c", vec(player.pos.x + 3, player.pos.y - 15));
+	bar(player.pos.x - 5, player.pos.y - 9, 20, 3, stiltsLeftAngle, 0.5).isColliding;
+	bar(player.pos.x + 5, player.pos.y - 9, 20, 3, stiltsRightAngle, 0.5).isColliding;
+	color("black");
+	char("a", vec(player.pos.x, player.pos.y - 19));
 	color("green");
 	// Ground checking Conditions
 	remove(Ground, (g) => {
 		//CAUTION: it may execute many times after one tick causing the speed inconsistency
 		// Checks collision with ground and moves player down if not colliding
 		// Add gravity to the player when collide with ground
-		color("yellow");
-		isColliding = isColliding || onGround;
+		color("transparent");
+		isColliding = isColliding || char("b", player.pos).isColliding.rect.green;
 		// Remove the Ground when it is out of the screen
 		return g.pos.x + g.width < 0;
 	});
 
-	// Make the player on screen
-	color("black");
-	char("a", player.pos)
-
+	color("yellow");
 	// Move the player forward when player pressing the button,
 	// else it will shift player to the left of the scene.
 	if (input.isPressed) {
+		GAME.PLAYERSPEED = 8;
 		if (player.pos.y <= GAME.HEIGHT - 10) {
 			if (player.pos.x < GAME.WIDTH){ // Don't allow the player to move out from the right bound
 				player.pos.x += GAME.PLAYERSPEED * 0.1;
 			}
-			player.pos.y += GAME.GRAVITY;
 
-			// The Stilts Animation when player is moving
+
+		}else{
+			player.pos.x -= scr;
+			player.pos.y += GAME.GRAVITY;
+		} 
+	} else {
+		GAME.PLAYERSPEED = 2;
+		if (!isColliding || player.pos.y >= GAME.HEIGHT - 10) {
+			player.pos.x -= scr;
+			player.pos.y += GAME.GRAVITY;
+		}
+	}
+				// The Stilts Animation when player is moving
 			// It rotate left and right stilt interchange which looks like moving
 			if (!flip) {
-				stiltsRightAngle += -0.01 * PI;
+				stiltsRightAngle += -GAME.PLAYERSPEED/200 * PI;
 				if (interchange) {
-					stiltsLeftAngle += 0.01 * PI;
+					stiltsLeftAngle += GAME.PLAYERSPEED/200 * PI;
 				}
-				if (stiltsRightAngle < 1.0) {
+				if (stiltsRightAngle < 1.1) {
 					flip = true;
 					interchange = true;
 				}
 			} else if (flip) {
-				stiltsRightAngle += 0.01 * PI;
+				stiltsRightAngle += GAME.PLAYERSPEED/200 * PI;
 				if (interchange) {
-					stiltsLeftAngle += -0.01 * PI;
+					stiltsLeftAngle += -GAME.PLAYERSPEED/200 * PI;
 				}
-				if (stiltsRightAngle > 1.7) {
+				if (stiltsRightAngle > 1.9) {
 					flip = false;
 					interchange = true;
 				}
 			}
-
-		} else {
-			player.pos.y += GAME.GRAVITY;
-		}
-	} else {
-		if (!isColliding || player.pos.y >= GAME.HEIGHT - 10) {
-			player.pos.x -= scr;
-			player.pos.y += GAME.GRAVITY;
-		} else {
-			player.pos.x -= scr;
-		}
-	}
 
 	// The Game End condition when player touch the bottom of the scene
 	// or move too slow (Touch the left bound of the screen).

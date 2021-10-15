@@ -4,7 +4,8 @@ title = "Stilts";
 // Instruction to play the game
 description = `
 [Tap] Climb up/down
-[Hold] Accelerate across gaps
+[Hold] Accelerate
+       across gaps
 `;
 
 // Sprites in the game
@@ -43,7 +44,7 @@ const GAME = {
 options = {
 	isPlayingBgm: true,
 	isReplayEnabled: true,
-	seed: 16,
+	seed: 6,
 	viewSize: { x: GAME.WIDTH, y: GAME.HEIGHT },
 	isCapturing: true,
     isCapturingGameCanvasOnly: true,
@@ -63,7 +64,7 @@ let onGround;
 let Ground;
 let nextGroundDist;
 let isColliding;
-
+let isup;
 // Where game update
 function update() {
 	// Initialize varaibles
@@ -73,6 +74,7 @@ function update() {
 		player = { pos: vec(GAME.WIDTH / 2, GAME.HEIGHT - 20), angle: -PI / 2 };
 		stiltsLeftAngle = PI / 2;
 		stiltsRightAngle = PI / 2;
+		isup = true;
 		flip = false;
 		interchange = false;
 		onGround = false;
@@ -104,16 +106,24 @@ function update() {
 		color("green");
 		rect(g.pos.x, g.pos.y, g.width, 26);
 	});
-
-
+	if(input.isJustPressed){
+		isup = isup ? false : true;
+	}
 	// Add Stilts Steps for the player
 	color("yellow");
-	char("c", vec(player.pos.x - 5, player.pos.y - 15));
-	char("c", vec(player.pos.x + 3, player.pos.y - 15));
 	bar(player.pos.x - 5, player.pos.y - 9, 20, 3, stiltsLeftAngle, 0.5).isColliding;
 	bar(player.pos.x + 5, player.pos.y - 9, 20, 3, stiltsRightAngle, 0.5).isColliding;
-	color("black");
-	char("a", vec(player.pos.x, player.pos.y - 19));
+	if(isup){
+		char("c", vec(player.pos.x - 5, player.pos.y - 15));
+		char("c", vec(player.pos.x + 3, player.pos.y - 15));
+		color("black");
+		char("a", vec(player.pos.x, player.pos.y - 19));
+	}else{
+		char("c", vec(player.pos.x - 5, player.pos.y - 6));
+		char("c", vec(player.pos.x + 3, player.pos.y - 6));
+		color("black");
+		char("a", vec(player.pos.x, player.pos.y - 10));
+	}
 	color("green");
 	// Ground checking Conditions
 	remove(Ground, (g) => {

@@ -3,7 +3,8 @@ title = "Stilts";
 
 // Instruction to play the game
 description = `
-[Hold] Walk
+[Tap] Climb up/down
+[Hold] Accelerate across gaps
 `;
 
 // Sprites in the game

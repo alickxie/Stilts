@@ -112,8 +112,8 @@ function update() {
 			player.pos.y += GAME.GRAVITY;
 		}
 		}else{
-			player.pos.x -= scr;
 			if (!isColliding || player.pos.y >= GAME.HEIGHT - 10) {
+				player.pos.x -= scr;
 				player.pos.y += GAME.GRAVITY;
 			}
 		}

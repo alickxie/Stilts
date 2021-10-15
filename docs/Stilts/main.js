@@ -96,7 +96,7 @@ function update() {
 
 	// Ground checking Conditions
 	remove(Ground, (g) => {
-		//CAUTION: it will execute many times after one tick causing the speed inconsistency
+		//CAUTION: it may execute many times after one tick causing the speed inconsistency
 		// Checks collision with ground and moves player down if not colliding
 		// Add gravity to the player when collide with ground
 		color("black");
